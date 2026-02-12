@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Un pequeño juego para ti ❤️</title>
+
   <style>
     body {
       margin: 0;
@@ -12,102 +13,170 @@
       align-items: center;
       height: 100vh;
       font-family: Arial, sans-serif;
+      overflow: hidden;
     }
+
     canvas {
-      background: #fff;
+      background: white;
       border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
+
     #message {
       position: absolute;
       text-align: center;
-      font-size: 28px;
+      font-size: 26px;
       color: #d6336c;
       display: none;
+      background: rgba(255,255,255,0.9);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+
+    button {
+      background: #ff4d6d;
+      border: none;
+      color: white;
+      padding: 12px 22px;
+      margin: 6px;
+      font-size: 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    button:hover {
+      background: #d6336c;
+      transform: scale(1.05);
+    }
+
+    .heart {
+      position: absolute;
+      font-size: 24px;
+      animation: floatUp 2.5s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-150px) scale(1.8);
+      }
     }
   </style>
 </head>
+
 <body>
 
 <canvas id="game" width="400" height="600"></canvas>
+
 <div id="message">
   💖 Claudia 💖<br><br>
-  He hecho este juego solo para ti.<br><br>
-  ¿Quieres ser mi San Valentín? 🌹
+  Hice este pequeño juego solo para ti.<br><br>
+  ¿Quieres ser mi San Valentín? 🌹<br><br>
+
+  <button onclick="answer()">Sí 💕</button>
+  <button onclick="answer()">Claro 😄</button>
+  <button onclick="answer()">Obvio ❤️</button>
 </div>
 
+<!-- 🎵 Música romántica -->
+<audio id="music" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
 
-let heart = { x: 180, y: 520, size: 30 };
-let obstacles = [];
-let time = 0;
-let gameOver = false;
+  let heart = { x: 180, y: 520, size: 30 };
+  let obstacles = [];
+  let time = 0;
 
-function drawHeart() {
-  ctx.font = "30px Arial";
-  ctx.fillText("❤️", heart.x, heart.y);
-}
+  function drawHeart() {
+    ctx.font = "30px Arial";
+    ctx.fillText("❤️", heart.x, heart.y);
+  }
 
-function drawObstacles() {
-  ctx.fillStyle = "#ff4d6d";
-  obstacles.forEach(o => {
-    ctx.fillRect(o.x, o.y, o.w, o.h);
-  });
-}
-
-function updateObstacles() {
-  if (time % 60 === 0) {
-    obstacles.push({
-      x: Math.random() * 350,
-      y: -20,
-      w: 50,
-      h: 20
+  function drawObstacles() {
+    ctx.fillStyle = "#ff4d6d";
+    obstacles.forEach(o => {
+      ctx.fillRect(o.x, o.y, o.w, o.h);
     });
   }
-  obstacles.forEach(o => o.y += 4);
-}
 
-function checkCollision() {
-  obstacles.forEach(o => {
-    if (
-      heart.x < o.x + o.w &&
-      heart.x + heart.size > o.x &&
-      heart.y < o.y + o.h &&
-      heart.y + heart.size > o.y
-    ) {
-      gameOver = true;
+  function updateObstacles() {
+    if (time % 60 === 0) {
+      obstacles.push({
+        x: Math.random() * 350,
+        y: -20,
+        w: 50,
+        h: 20
+      });
     }
-  });
-}
-
-function loop() {
-  if (gameOver) return;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawHeart();
-  updateObstacles();
-  drawObstacles();
-  checkCollision();
-
-  time++;
-
-  if (time > 600) {
-    canvas.style.display = "none";
-    document.getElementById("message").style.display = "block";
-    return;
+    obstacles.forEach(o => o.y += 4);
   }
 
-  requestAnimationFrame(loop);
-}
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-document.addEventListener("keydown", e => {
-  if (e.key === "ArrowLeft" && heart.x > 0) heart.x -= 20;
-  if (e.key === "ArrowRight" && heart.x < 360) heart.x += 20;
-});
+    drawHeart();
+    updateObstacles();
+    drawObstacles();
 
-loop();
+    time++;
+
+    if (time > 600) {
+      canvas.style.display = "none";
+      document.getElementById("message").style.display = "block";
+      return;
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft" && heart.x > 0) heart.x -= 20;
+    if (e.key === "ArrowRight" && heart.x < 360) heart.x += 20;
+  });
+
+  function answer() {
+    // 🎵 Iniciar música
+    document.getElementById("music").play();
+
+    // 💖 Crear corazones animados
+    for (let i = 0; i < 30; i++) {
+      createFloatingHeart();
+    }
+
+    // 💌 Mensaje final
+    document.getElementById("message").innerHTML = `
+      💖 Sabía que dirías que sí 💖<br><br>
+      Gracias por hacerme tan feliz.<br><br>
+      Feliz San Valentín 🌹❤️
+    `;
+  }
+
+  function createFloatingHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerText = "❤️";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.bottom = "0px";
+    document.body.appendChild(heart);
+
+    setTimeout(() => {
+      heart.remove();
+    }, 2500);
+  }
+
+  loop();
 </script>
 
 </body>
