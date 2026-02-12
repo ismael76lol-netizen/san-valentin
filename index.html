@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Un pequeño juego para ti ❤️</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    #message {
+      position: absolute;
+      text-align: center;
+      font-size: 28px;
+      color: #d6336c;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="game" width="400" height="600"></canvas>
+<div id="message">
+  💖 Claudia 💖<br><br>
+  He hecho este juego solo para ti.<br><br>
+  ¿Quieres ser mi San Valentín? 🌹
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let heart = { x: 180, y: 520, size: 30 };
+let obstacles = [];
+let time = 0;
+let gameOver = false;
+
+function drawHeart() {
+  ctx.font = "30px Arial";
+  ctx.fillText("❤️", heart.x, heart.y);
+}
+
+function drawObstacles() {
+  ctx.fillStyle = "#ff4d6d";
+  obstacles.forEach(o => {
+    ctx.fillRect(o.x, o.y, o.w, o.h);
+  });
+}
+
+function updateObstacles() {
+  if (time % 60 === 0) {
+    obstacles.push({
+      x: Math.random() * 350,
+      y: -20,
+      w: 50,
+      h: 20
+    });
+  }
+  obstacles.forEach(o => o.y += 4);
+}
+
+function checkCollision() {
+  obstacles.forEach(o => {
+    if (
+      heart.x < o.x + o.w &&
+      heart.x + heart.size > o.x &&
+      heart.y < o.y + o.h &&
+      heart.y + heart.size > o.y
+    ) {
+      gameOver = true;
+    }
+  });
+}
+
+function loop() {
+  if (gameOver) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawHeart();
+  updateObstacles();
+  drawObstacles();
+  checkCollision();
+
+  time++;
+
+  if (time > 600) {
+    canvas.style.display = "none";
+    document.getElementById("message").style.display = "block";
+    return;
+  }
+
+  requestAnimationFrame(loop);
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft" && heart.x > 0) heart.x -= 20;
+  if (e.key === "ArrowRight" && heart.x < 360) heart.x += 20;
+});
+
+loop();
+</script>
+
+</body>
+</html>
